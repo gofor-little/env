@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gofor-little/env"
 	"github.com/stretchr/testify/assert"
-	env "github.com/taliesinmillhouse/little-env"
 )
 
 func TestLoad(t *testing.T) {

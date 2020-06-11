@@ -13,7 +13,11 @@
 
 # Text editors/IDEs
 .vscode
+__debug_bin
 .idea
+
+# Directories.
+dist
 
 # Env files
 *.env
