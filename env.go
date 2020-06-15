@@ -30,7 +30,7 @@ func Load(filenames ...string) error {
 
 	for key, value := range envs {
 		if os.Getenv(key) != "" {
-			continue
+			return err
 		}
 
 		if err := os.Setenv(key, value); err != nil {
