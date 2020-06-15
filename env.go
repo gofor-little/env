@@ -18,7 +18,7 @@ func Load(filenames ...string) error {
 	for _, filename := range filenames {
 		fileData, err := ioutil.ReadFile(filename)
 		if err != nil {
-			continue
+			return err
 		}
 
 		fileEnvs := parse(fileData)
@@ -30,7 +30,7 @@ func Load(filenames ...string) error {
 
 	for key, value := range envs {
 		if os.Getenv(key) != "" {
-			return err
+			continue
 		}
 
 		if err := os.Setenv(key, value); err != nil {
