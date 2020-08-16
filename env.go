@@ -113,13 +113,13 @@ func Write(key, value, fileName string) error {
 }
 
 // Get gets an environment variable with a default backup value as the second parameter.
-func Get(key, def string) string {
+func Get(key, defaultValue string) string {
 	value := os.Getenv(key)
 	if value != "" {
 		return value
 	}
 
-	return def
+	return defaultValue
 }
 
 // MustGet gets an environment variable and will return an error if the environment
