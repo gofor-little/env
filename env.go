@@ -49,8 +49,8 @@ func Load(filenames ...string) error {
 	return nil
 }
 
-// Write writes a key value pair to a file that can be set to an
-// environment variable later on with env.Load().
+// Write writes a key-value pair to a file that can be set to an environment
+// variable later on with env.Load().
 func Write(key, value, fileName string) error {
 	fileData, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -59,10 +59,21 @@ func Write(key, value, fileName string) error {
 
 	fileEnvs := parse(fileData)
 	fileEnvs[key] = value
-	backupFileName := ".back_" + fileName
+	backupFileName := fileName + ".back"
 
-	_, err = copy(fileName, backupFileName)
+	sourceFile, err := os.Open(fileName)
 	if err != nil {
+		return err
+	}
+	defer func() { _ = sourceFile.Close() }()
+
+	destinationFile, err := os.Create(backupFileName)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = destinationFile.Close() }()
+
+	if _, err := io.Copy(sourceFile, destinationFile); err != nil {
 		return err
 	}
 
@@ -71,7 +82,7 @@ func Write(key, value, fileName string) error {
 		return err
 	}
 
-	keys := []string{}
+	var keys []string
 	for key := range fileEnvs {
 		keys = append(keys, key)
 	}
@@ -86,6 +97,8 @@ func Write(key, value, fileName string) error {
 		}
 	}
 
+	_ = destinationFile.Close()
+
 	if writeFailed {
 		if err := os.Rename(backupFileName, fileName); err != nil {
 			return err
@@ -99,24 +112,38 @@ func Write(key, value, fileName string) error {
 	return nil
 }
 
-func copy(source, destination string) (int64, error) {
-	sourceFile, err := os.Open(source)
-	if err != nil {
-		return 0, err
+// Get gets an environment variable with a default backup value as the second parameter.
+func Get(key, def string) string {
+	value := os.Getenv(key)
+	if value != "" {
+		return value
 	}
-	defer sourceFile.Close()
 
-	destinationFile, err := os.Create(destination)
-	if err != nil {
-		return 0, err
-	}
-	defer destinationFile.Close()
-
-	return io.Copy(sourceFile, destinationFile)
+	return def
 }
 
-func parse(fileData []byte) map[string]string {
-	lines := strings.Split(string(fileData), "\n")
+// MustGet gets an environment variable and will return an error if the environment
+// variable is not set or is empty.
+func MustGet(key string) (string, error) {
+	value := os.Getenv(key)
+	if value != "" {
+		return value, nil
+	}
+
+	return "", fmt.Errorf("environment variable value is not set or is empty for key: %s", key)
+}
+
+// Set is just a wrapper os.Setenv, this is useful for locally overriding
+// environment variables.
+func Set(key, value string) error {
+	return os.Setenv(key, value)
+}
+
+// parse takes in a byte array first, splitting it into separate lines, then
+// splitting those lines into key-value pairs using the '=' character as a delimiter.
+// Finally the key-value pairs are returned as a map.
+func parse(data []byte) map[string]string {
+	lines := strings.Split(string(data), "\n")
 	envs := map[string]string{}
 
 	for _, line := range lines {
