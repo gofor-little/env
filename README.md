@@ -14,8 +14,8 @@ func main() {
 		panic(err)
 	}
 
-	// Write a key-value pair to and .env file.
-	if err := env.Write("KEY", "VALUE", "FILE_PATH"); err != nil {
+	// Write a key-value pair to an .env file and call env.Set on it.
+	if err := env.Write("KEY", "VALUE", "FILE_PATH", true); err != nil {
 		panic(err)
 	}
 

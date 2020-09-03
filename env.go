@@ -10,12 +10,13 @@ import (
 	"strings"
 )
 
-// Load loads and sets the environment variables from file using filenames.
-func Load(filenames ...string) error {
+// Load loads and sets the environment variables from file using fileNames.
+func Load(fileNames ...string) error {
 	envs := map[string]string{}
 	var failedEnvs bytes.Buffer
 
-	for _, filename := range filenames {
+	// Range over the fileNames and parse them into a map.
+	for _, filename := range fileNames {
 		fileData, err := ioutil.ReadFile(filename)
 		if err != nil {
 			return err
@@ -28,6 +29,7 @@ func Load(filenames ...string) error {
 		}
 	}
 
+	// Range over the map and call os.Setenv on each key-value pair.
 	for key, value := range envs {
 		if os.Getenv(key) != "" {
 			continue
@@ -49,18 +51,21 @@ func Load(filenames ...string) error {
 	return nil
 }
 
-// Write writes a key-value pair to a file that can be set to an environment
-// variable later on with env.Load().
-func Write(key, value, fileName string) error {
+// Write writes a key-value pair to a file that can be set to an environment variable later on with
+// env.Load(). If 'setAfterWrite' is true env.Set will also be called on the key-value pair.
+func Write(key, value, fileName string, setAfterWrite bool) error {
+	// Read the file data.
 	fileData, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return err
 	}
 
+	// Parse the file data into a map.
 	fileEnvs := parse(fileData)
 	fileEnvs[key] = value
 	backupFileName := fileName + ".back"
 
+	// Create a backup of the file we're going to be modifying and copy the data across.
 	sourceFile, err := os.Open(fileName)
 	if err != nil {
 		return err
@@ -77,29 +82,42 @@ func Write(key, value, fileName string) error {
 		return err
 	}
 
+	// Truncate the existing file so we can write the updated list of key-value pairs.
 	file, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
 
+	// Get keys from fileEnvs so we can sort their order before we write to file.
 	var keys []string
 	for key := range fileEnvs {
 		keys = append(keys, key)
 	}
 
 	sort.Strings(keys)
-	writeFailed := false
+	ok := true
 
+	// Write the key-value pairs to file.
 	for _, k := range keys {
 		_, err = file.WriteString(fmt.Sprintf("%v=%v\n", k, fileEnvs[k]))
 		if err != nil {
-			writeFailed = true
+			ok = false
 		}
 	}
 
 	_ = destinationFile.Close()
 
-	if writeFailed {
+
+	// If writing to file was successful and setAfterWrite is true, set the key-value pair as an
+	// environment variable.
+	if ok && setAfterWrite {
+		if err := Set(key, value); err != nil {
+			ok = false
+		}
+	}
+
+	// If writing to file or setting the new environment variable failed rollback the file changes.
+	if !ok {
 		if err := os.Rename(backupFileName, fileName); err != nil {
 			return err
 		}
