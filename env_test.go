@@ -30,11 +30,11 @@ func TestLoad(t *testing.T) {
 }
 
 func TestWrite(t *testing.T) {
-	if err := env.Write("PUBLIC_KEY_NEW", "public_key_new", "test-data/test-1.env"); err != nil {
+	if err := env.Write("PUBLIC_KEY_NEW", "public_key_new", "test-data/test-1.env", true); err != nil {
 		t.Fatalf("failed to write to .env file: %v", err)
 	}
 
-	if err := env.Write("DB_PASSWORD", "db_password_new", "test-data/test-2.env"); err != nil {
+	if err := env.Write("DB_PASSWORD", "db_password_new", "test-data/test-2.env", true); err != nil {
 		t.Fatalf("failed to write to .env file: %v", err)
 	}
 }
