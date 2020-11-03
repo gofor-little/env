@@ -1,8 +1,17 @@
 ## A package for managing .env files and environment variables
+
+![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/gofor-little/env?include_prereleases)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gofor-little/env)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/gofor-little/env/main/LICENSE)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/gofor-little/env/Go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gofor-little/env)](https://goreportcard.com/report/github.com/gofor-little/env)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/gofor-little/env)](https://pkg.go.dev/github.com/gofor-little/env)
+
+### Introduction
 * Read from and write to .env files
 * Get and set environment variables
 
-# Example
+### Example
 ```go
 package main
 
@@ -34,3 +43,6 @@ func main() {
 	}
 }
 ```
+
+### Testing
+Run ```go test ./...``` in the root directory.
