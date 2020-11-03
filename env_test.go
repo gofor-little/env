@@ -12,25 +12,25 @@ func TestLoad(t *testing.T) {
 		t.Fatalf("failed to load .env files: %v", err)
 	}
 
-	if os.Getenv("PUBLIC_KEY") != "public_key" {
+	if env.Get("PUBLIC_KEY", "") != os.Getenv("PUBLIC_KEY") {
 		t.Fatalf("unexpected result from PUBLIC_KEY environment variable: %s", os.Getenv("PUBLIC_KEY"))
 	}
 
-	if os.Getenv("PRIVATE_KEY") != "private_key" {
+	if env.Get("PRIVATE_KEY", "") != os.Getenv("PRIVATE_KEY") {
 		t.Fatalf("unexpected result from PRIVATE_KEY environment variable: %s", os.Getenv("PRIVATE_KEY"))
 	}
 
-	if os.Getenv("DB_NAME") != "db_name" {
+	if env.Get("DB_NAME", "") != os.Getenv("DB_NAME") {
 		t.Fatalf("unexpected result from DB_NAME environment variable: %s", os.Getenv("DB_NAME"))
 	}
 
-	if os.Getenv("DB_PASSWORD") != "db_password" {
+	if env.Get("DB_PASSWORD", "") != os.Getenv("DB_PASSWORD") {
 		t.Fatalf("unexpected result from DB_PASSWORD environment variable: %s", os.Getenv("DB_PASSWORD"))
 	}
 }
 
 func TestWrite(t *testing.T) {
-	if err := env.Write("PUBLIC_KEY_NEW", "public_key_new", "test-data/test-1.env", true); err != nil {
+	if err := env.Write("PUBLIC_KEY_NEW", "\"public\\nkey\\nnew\"", "test-data/test-1.env", true); err != nil {
 		t.Fatalf("failed to write to .env file: %v", err)
 	}
 
