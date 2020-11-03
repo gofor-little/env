@@ -3,7 +3,6 @@ package env
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"sort"
@@ -22,7 +21,7 @@ func Load(fileNames ...string) error {
 			return err
 		}
 
-		fileEnvs := parse(fileData)
+		fileEnvs := parse(fileData, true)
 
 		for key, value := range fileEnvs {
 			envs[key] = value
@@ -61,24 +60,12 @@ func Write(key, value, fileName string, setAfterWrite bool) error {
 	}
 
 	// Parse the file data into a map.
-	fileEnvs := parse(fileData)
+	fileEnvs := parse(fileData, false)
 	fileEnvs[key] = value
 	backupFileName := fileName + ".back"
 
-	// Create a backup of the file we're going to be modifying and copy the data across.
-	sourceFile, err := os.Open(fileName)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = sourceFile.Close() }()
-
-	destinationFile, err := os.Create(backupFileName)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = destinationFile.Close() }()
-
-	if _, err := io.Copy(sourceFile, destinationFile); err != nil {
+	// Write to the backup file.
+	if err := ioutil.WriteFile(backupFileName, []byte(fmt.Sprintf("%#v", fileData)), 0644); err != nil {
 		return err
 	}
 
@@ -104,9 +91,6 @@ func Write(key, value, fileName string, setAfterWrite bool) error {
 			ok = false
 		}
 	}
-
-	_ = destinationFile.Close()
-
 
 	// If writing to file was successful and setAfterWrite is true, set the key-value pair as an
 	// environment variable.
@@ -160,7 +144,7 @@ func Set(key, value string) error {
 // parse takes in a byte array first, splitting it into separate lines, then
 // splitting those lines into key-value pairs using the '=' character as a delimiter.
 // Finally the key-value pairs are returned as a map.
-func parse(data []byte) map[string]string {
+func parse(data []byte, stripQuotes bool) map[string]string {
 	lines := strings.Split(string(data), "\n")
 	envs := map[string]string{}
 
@@ -171,7 +155,21 @@ func parse(data []byte) map[string]string {
 			continue
 		}
 
-		envs[strings.TrimSpace(lineParts[0])] = strings.TrimSpace(lineParts[1])
+		key := strings.TrimSpace(lineParts[0])
+		value := strings.TrimSpace(lineParts[1])
+
+		if stripQuotes && value[0] == '"' && value[len(value) - 1] == '"' {
+			for i := range value {
+				if i > 0 {
+					value = value[i:]
+					break
+				}
+			}
+
+			value = value[:len(value) - 1]
+		}
+
+		envs[key] = value
 	}
 
 	return envs
