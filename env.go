@@ -158,7 +158,7 @@ func parse(data []byte, stripQuotes bool) map[string]string {
 		key := strings.TrimSpace(lineParts[0])
 		value := strings.TrimSpace(lineParts[1])
 
-		if stripQuotes && value[0] == '"' && value[len(value) - 1] == '"' {
+		if stripQuotes && value[0] == '"' && value[len(value)-1] == '"' {
 			for i := range value {
 				if i > 0 {
 					value = value[i:]
@@ -166,7 +166,7 @@ func parse(data []byte, stripQuotes bool) map[string]string {
 				}
 			}
 
-			value = value[:len(value) - 1]
+			value = value[:len(value)-1]
 		}
 
 		envs[key] = value
