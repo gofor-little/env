@@ -10,6 +10,7 @@
 ### Introduction
 * Read from and write to .env files
 * Get and set environment variables
+* No dependencies outside the standard library
 
 ### Example
 ```go
