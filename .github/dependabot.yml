@@ -1,8 +1,11 @@
 version: 2
 updates:
-- package-ecosystem: gomod
+- package-ecosystem: "gomod"
   directory: "/"
   schedule:
-    interval: daily
-    time: "17:00"
+    interval: "weekly"
+    day: "saturday"
+    time: "03:00"
+    timezone: "Australia/Sydney"
+  target-branch: "main"
   open-pull-requests-limit: 10
