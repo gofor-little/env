@@ -12,13 +12,13 @@ jobs:
       - uses: actions/stale@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          stale-issue-message: This issue is stale because it has been open ${{ secrets.OPEN_DAYS }} days with no activity. Remove stale label or comment or this will be closed in ${{ secrets.STALE_DAYS }} days.
-          stale-pr-message: This pull request is stale because it has been open ${{ secrets.OPEN_DAYS }} days with no activity. Remove stale label or comment or this will be closed in ${{ secrets.STALE_DAYS }} days.
-          close-issue-message: This issue has been closed because it has been open for ${{ secrets.TOTAL_DAYS }} days with no activity.
-          close-pr-message: This pull request has been closed because it has been open for ${{ secrets.TOTAL_DAYS }} days with no activity.
+          stale-issue-message: This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 5 days.
+          stale-pr-message: This pull request is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 5 days.
+          close-issue-message: This issue has been closed because it has been open for 35 days with no activity.
+          close-pr-message: This pull request has been closed because it has been open for 35 days with no activity.
           stale-issue-label: stale-closing-soon
           stale-pr-label: stale-closing-soon
           close-issue-label: stale-closed
           close-pr-label: stale-closed
-          days-before-stale: ${{ secrets.OPEN_DAYS }}
-          days-before-close: ${{ secrets.STALE_DAYS }}
+          days-before-stale: 30
+          days-before-close: 5

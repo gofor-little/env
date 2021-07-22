@@ -12,15 +12,20 @@
 *.out
 
 # Text editors/IDEs.
-.vscode
 __debug_bin
-.idea
+.vscode/
+.idea/
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
 
 # Directories.
-dist
+dist/
+node_modules/
 
-# Env files.
-.env
-
-# Files from failed tests.
-*.back
+# Files.
+*.env
+*.js
+!jest.config.js
+*.d.ts
