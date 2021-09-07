@@ -1,0 +1,16 @@
+name: Security Scan
+
+on:
+  push:
+  schedule:
+  - cron: 0 17 * * 5
+
+jobs:
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: securego/gosec@master
+        with:
+          args: ./...

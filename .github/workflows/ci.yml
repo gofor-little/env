@@ -7,6 +7,14 @@ on:
     branches: [ main ]
 
 jobs:
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: securego/gosec@master
+        with:
+          args: ./...
   test:
     name: Test
     runs-on: ubuntu-latest
