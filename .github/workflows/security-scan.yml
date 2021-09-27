@@ -1,9 +1,8 @@
 name: Security Scan
 
 on:
-  push:
   schedule:
-  - cron: 0 17 * * 5
+    - cron: 0 0 * * *
 
 jobs:
   security-check:
