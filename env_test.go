@@ -15,6 +15,7 @@ func TestLoad(t *testing.T) {
 	require.True(t, env.Get("PRIVATE_KEY", "") == os.Getenv("PRIVATE_KEY"))
 	require.True(t, env.Get("DB_NAME", "") == os.Getenv("DB_NAME"))
 	require.True(t, env.Get("DB_PASSWORD", "") == os.Getenv("DB_PASSWORD"))
+	require.True(t, env.Get("SPECIAL_CHARACTERS", "") == os.Getenv("SPECIAL_CHARACTERS"))
 }
 
 func TestWrite(t *testing.T) {
@@ -26,6 +27,7 @@ func TestGet(t *testing.T) {
 	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-2.env"))
 
 	require.True(t, env.Get("DB_NAME", "db_name_default") == "db_name")
+	require.True(t, env.Get("SPECIAL_CHARACTERS", "") == "special=characters")
 	require.True(t, env.Get("FAKE_KEY", "db_name_default") == "db_name_default")
 }
 
@@ -35,6 +37,10 @@ func TestMustGet(t *testing.T) {
 	value, err := env.MustGet("DB_NAME")
 	require.NoError(t, err)
 	require.True(t, value == "db_name")
+
+	value, err = env.MustGet("SPECIAL_CHARACTERS")
+	require.NoError(t, err)
+	require.True(t, value == "special=characters")
 
 	_, err = env.MustGet("FAKE_KEY")
 	require.True(t, err != nil)

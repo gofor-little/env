@@ -16,13 +16,16 @@ func Load(fileNames ...string) error {
 	var failedEnvs bytes.Buffer
 
 	// Range over the fileNames and parse them into a map.
-	for _, filename := range fileNames {
-		fileData, err := ioutil.ReadFile(filepath.Clean(filename))
+	for _, fileName := range fileNames {
+		fileData, err := ioutil.ReadFile(filepath.Clean(fileName))
 		if err != nil {
 			return err
 		}
 
-		fileEnvs := parse(fileData, true)
+		fileEnvs, err := parse(fileData, true)
+		if err != nil {
+			return fmt.Errorf("failed to parse file at %s: %w", fileName, err)
+		}
 
 		for key, value := range fileEnvs {
 			envs[key] = value
@@ -61,7 +64,10 @@ func Write(key, value, fileName string, setAfterWrite bool) error {
 	}
 
 	// Parse the file data into a map.
-	fileEnvs := parse(fileData, false)
+	fileEnvs, err := parse(fileData, false)
+	if err != nil {
+		return fmt.Errorf("failed to parse file at %s: %w", fileName, err)
+	}
 	fileEnvs[key] = value
 	backupFileName := fileName + ".back"
 
@@ -145,15 +151,19 @@ func Set(key, value string) error {
 // parse takes in a byte array first, splitting it into separate lines, then
 // splitting those lines into key-value pairs using the '=' character as a delimiter.
 // Finally the key-value pairs are returned as a map.
-func parse(data []byte, stripQuotes bool) map[string]string {
+func parse(data []byte, stripQuotes bool) (map[string]string, error) {
 	lines := strings.Split(string(data), "\n")
 	envs := map[string]string{}
 
 	for _, line := range lines {
-		lineParts := strings.Split(line, "=")
+		if line == "" {
+			continue
+		}
+
+		lineParts := strings.SplitN(line, "=", 2)
 
 		if len(lineParts) != 2 {
-			continue
+			return nil, fmt.Errorf("failed to parse line, expected 2 parts got %d", len(lineParts))
 		}
 
 		key := strings.TrimSpace(lineParts[0])
@@ -173,5 +183,5 @@ func parse(data []byte, stripQuotes bool) map[string]string {
 		envs[key] = value
 	}
 
-	return envs
+	return envs, nil
 }
