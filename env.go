@@ -3,7 +3,6 @@ package env
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -17,7 +16,7 @@ func Load(fileNames ...string) error {
 
 	// Range over the fileNames and parse them into a map.
 	for _, fileName := range fileNames {
-		fileData, err := ioutil.ReadFile(filepath.Clean(fileName))
+		fileData, err := os.ReadFile(filepath.Clean(fileName))
 		if err != nil {
 			return err
 		}
@@ -58,7 +57,7 @@ func Load(fileNames ...string) error {
 // env.Load(). If 'setAfterWrite' is true env.Set will also be called on the key-value pair.
 func Write(key, value, fileName string, setAfterWrite bool) error {
 	// Read the file data.
-	fileData, err := ioutil.ReadFile(filepath.Clean(fileName))
+	fileData, err := os.ReadFile(filepath.Clean(fileName))
 	if err != nil {
 		return err
 	}
@@ -72,7 +71,7 @@ func Write(key, value, fileName string, setAfterWrite bool) error {
 	backupFileName := fileName + ".back"
 
 	// Write to the backup file.
-	if err := ioutil.WriteFile(backupFileName, []byte(fmt.Sprintf("%#v", fileData)), 0600); err != nil {
+	if err := os.WriteFile(backupFileName, []byte(fmt.Sprintf("%#v", fileData)), 0600); err != nil {
 		return err
 	}
 
