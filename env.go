@@ -76,7 +76,7 @@ func Write(key, value, fileName string, setAfterWrite bool) error {
 	}
 
 	// Truncate the existing file so we can write the updated list of key-value pairs.
-	file, err := os.Create(fileName)
+	file, err := os.Create(filepath.Clean(fileName))
 	if err != nil {
 		return err
 	}
