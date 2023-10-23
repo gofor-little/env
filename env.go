@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -151,6 +152,44 @@ func Set(key, value string) error {
 // splitting those lines into key-value pairs using the '=' character as a delimiter.
 // Finally the key-value pairs are returned as a map.
 func parse(data []byte, stripQuotes bool) (map[string]string, error) {
+	lines := strings.Split(string(data), "\n")
+	envs := map[string]string{}
+
+	for _, line := range lines {
+		// skip empty lines and comments
+		if line == "" || regexp.MustCompile(`^\s*#|^\s*"#`).MatchString(line) {
+			continue
+		}
+
+		lineParts := strings.SplitN(line, "=", 2)
+
+		if len(lineParts) != 2 {
+			return nil, fmt.Errorf("failed to parse line, expected 2 parts got %d", len(lineParts))
+		}
+
+		key := strings.TrimSpace(lineParts[0])
+		value := strings.TrimSpace(lineParts[1])
+
+		// todo: handle inline comments and allow hashtag between quotes
+
+		if stripQuotes && value[0] == '"' && value[len(value)-1] == '"' {
+			for i := range value {
+				if i > 0 {
+					value = value[i:]
+					break
+				}
+			}
+
+			value = value[:len(value)-1]
+		}
+
+		envs[key] = value
+	}
+
+	return envs, nil
+}
+
+func Parse(data []byte, stripQuotes bool) (map[string]string, error) {
 	lines := strings.Split(string(data), "\n")
 	envs := map[string]string{}
 

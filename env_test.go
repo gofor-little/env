@@ -9,7 +9,7 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-2.env"))
+	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-2.env", "test-data/test-3.env"))
 
 	require.True(t, env.Get("PUBLIC_KEY", "") == os.Getenv("PUBLIC_KEY"))
 	require.True(t, env.Get("PRIVATE_KEY", "") == os.Getenv("PRIVATE_KEY"))
@@ -24,11 +24,15 @@ func TestWrite(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-2.env"))
+	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-3.env"))
 
 	require.True(t, env.Get("DB_NAME", "db_name_default") == "db_name")
 	require.True(t, env.Get("SPECIAL_CHARACTERS", "") == "special=characters")
 	require.True(t, env.Get("FAKE_KEY", "db_name_default") == "db_name_default")
+	require.True(t, env.Get("COMMENTED_ENV", "") == "")
+	require.True(t, env.Get("COMMENTED_ENV2", "") == "")
+	require.True(t, env.Get("ENV_WITH_HASHTAG", "") == "#env_with_#")
+	require.True(t, env.Get("ENV_WITH_INLINE_COMMENT", "") == "env_with_inline_comment")
 }
 
 func TestMustGet(t *testing.T) {
@@ -52,4 +56,9 @@ func TestSet(t *testing.T) {
 
 	value := os.Getenv("DB_NAME")
 	require.True(t, value == "db_name_override")
+}
+
+func TestParse(t *testing.T) {
+	// err:= env.Load("test-data/test-1.env", "test-data/test-2.env")
+	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-2.env"))
 }
