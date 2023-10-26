@@ -170,42 +170,25 @@ func parse(data []byte, stripQuotes bool) (map[string]string, error) {
 		key := strings.TrimSpace(lineParts[0])
 		value := strings.TrimSpace(lineParts[1])
 
-		// todo: handle inline comments and allow hashtag between quotes
+		// Define a regular expression pattern to capture string within double quotes
+		regex := regexp.MustCompile(`"(.*?)"`)
+		match := regex.FindString(value)
 
-		if stripQuotes && value[0] == '"' && value[len(value)-1] == '"' {
-			for i := range value {
-				if i > 0 {
-					value = value[i:]
-					break
-				}
-			}
+		// Removes characters that are not enclosed within double quotes in a given string.
+		// if value is not contain double quotes, remove the inline comment
+		if match != "" {
+			value = match
+		} else {
+			// Define a regular expression pattern to match and capture everything after '#'
+			regex := regexp.MustCompile(`#.*`)
 
-			value = value[:len(value)-1]
+			// Replace the input string, removing everything after '#'
+			result := regex.ReplaceAllString(value, "")
+
+			// Trim any leading and trailing spaces
+			value = strings.TrimSpace(result)
+
 		}
-
-		envs[key] = value
-	}
-
-	return envs, nil
-}
-
-func Parse(data []byte, stripQuotes bool) (map[string]string, error) {
-	lines := strings.Split(string(data), "\n")
-	envs := map[string]string{}
-
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		lineParts := strings.SplitN(line, "=", 2)
-
-		if len(lineParts) != 2 {
-			return nil, fmt.Errorf("failed to parse line, expected 2 parts got %d", len(lineParts))
-		}
-
-		key := strings.TrimSpace(lineParts[0])
-		value := strings.TrimSpace(lineParts[1])
 
 		if stripQuotes && value[0] == '"' && value[len(value)-1] == '"' {
 			for i := range value {
