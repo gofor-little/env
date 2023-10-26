@@ -24,7 +24,7 @@ func TestWrite(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-3.env"))
+	require.NoError(t, env.Load("test-data/test-1.env", "test-data/test-2.env", "test-data/test-3.env"))
 
 	require.True(t, env.Get("DB_NAME", "db_name_default") == "db_name")
 	require.True(t, env.Get("SPECIAL_CHARACTERS", "") == "special=characters")
