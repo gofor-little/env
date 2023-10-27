@@ -45,5 +45,18 @@ func main() {
 }
 ```
 
+### Valid env variable examples
+```env
+# This is a comment example
+
+DB_NAME=dev_db # This is an inline comment example.
+# Everything after the # is interpreted as a comment.
+
+# DB_NAME=testing_db # This in an ignored env example
+
+DB_PASSWORD="#db_password#secret" # This is a wrapped env example
+# The # whitin double quotes is interpreted as the literal character 
+```
+
 ### Testing
 Run ```go test ./...``` in the root directory.

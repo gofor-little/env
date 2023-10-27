@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -155,7 +156,8 @@ func parse(data []byte, stripQuotes bool) (map[string]string, error) {
 	envs := map[string]string{}
 
 	for _, line := range lines {
-		if line == "" {
+		// skip empty lines and comments
+		if line == "" || regexp.MustCompile(`^\s*#|^\s*"#`).MatchString(line) {
 			continue
 		}
 
@@ -167,6 +169,26 @@ func parse(data []byte, stripQuotes bool) (map[string]string, error) {
 
 		key := strings.TrimSpace(lineParts[0])
 		value := strings.TrimSpace(lineParts[1])
+
+		// Define a regular expression pattern to capture string within double quotes
+		regex := regexp.MustCompile(`"(.*?)"`)
+		match := regex.FindString(value)
+
+		// Removes characters that are not enclosed within double quotes in a given string.
+		// if value is not contain double quotes, remove the inline comment
+		if match != "" {
+			value = match
+		} else {
+			// Define a regular expression pattern to match and capture everything after '#'
+			regex := regexp.MustCompile(`#.*`)
+
+			// Replace the input string, removing everything after '#'
+			result := regex.ReplaceAllString(value, "")
+
+			// Trim any leading and trailing spaces
+			value = strings.TrimSpace(result)
+
+		}
 
 		if stripQuotes && value[0] == '"' && value[len(value)-1] == '"' {
 			for i := range value {
